@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로또 시뮬레이터 - 로또 당첨 확률 체험 | 무료 로또 시뮬레이션</title>
+<meta name="description" content="로또 시뮬레이터로 로또 6/45 당첨 확률을 직접 체험해보세요. 실시간 추첨 시뮬레이션, 통계 분석, 손익분기점 계산까지 한 번에. 로또의 현실을 숫자로 확인하세요.">
+<meta name="keywords" content="로또 시뮬레이터, 로또 확률, 로또 당첨 확률, 로또 시뮬레이션, 로또 6/45, 로또 통계, 복권 확률, 로또 계산기">
+<meta name="author" content="로또 시뮬레이터">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="">
+<meta property="og:type" content="website">
+<meta property="og:title" content="로또 시뮬레이터 - 로또 당첨 확률을 직접 체험하세요">
+<meta property="og:description" content="무료 로또 시뮬레이터로 1등 당첨까지 얼마나 걸리는지 확인해보세요. 실시간 통계와 손익분기점 분석 제공.">
+<meta property="og:locale" content="ko_KR">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0a0a2e;
+    --bg-card: #1a1a4e;
+    --gold: #ffd700;
+    --neon-pink: #ff2d95;
+    --neon-blue: #00d4ff;
+    --neon-green: #39ff14;
+    --neon-purple: #bf5af2;
+    --neon-orange: #ff9500;
+    --text: #e0e0ff;
+  }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(255,45,149,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(0,212,255,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(57,255,20,0.06) 0%, transparent 50%);
+    z-index: 0;
+    animation: bgPulse 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes bgPulse {
+    0% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 30px 0 20px;
+  }
+
+  .header h1 {
+    font-size: 2.8rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), var(--neon-orange), var(--neon-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+    margin-bottom: 6px;
+  }
+
+  @keyframes titleGlow {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(1.3); }
+  }
+
+  .header p {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue), var(--neon-green));
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .icon {
+    font-size: 1.4rem;
+  }
+
+  /* Lotto balls */
+  .balls-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+
+  .ball {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    position: relative;
+    transition: transform 0.2s;
+  }
+
+  .ball::after {
+    content: '';
+    position: absolute;
+    top: 6px; left: 12px;
+    width: 18px; height: 10px;
+    background: rgba(255,255,255,0.35);
+    border-radius: 50%;
+    transform: rotate(-20deg);
+  }
+
+  .ball:hover { transform: scale(1.15); }
+
+  .ball.range1 { background: linear-gradient(135deg, #ffc107, #ff9800); box-shadow: 0 4px 15px rgba(255,193,7,0.4); }
+  .ball.range2 { background: linear-gradient(135deg, #2196f3, #1565c0); box-shadow: 0 4px 15px rgba(33,150,243,0.4); }
+  .ball.range3 { background: linear-gradient(135deg, #e91e63, #c2185b); box-shadow: 0 4px 15px rgba(233,30,99,0.4); }
+  .ball.range4 { background: linear-gradient(135deg, #9c27b0, #6a1b9a); box-shadow: 0 4px 15px rgba(156,39,176,0.4); }
+  .ball.range5 { background: linear-gradient(135deg, #4caf50, #2e7d32); box-shadow: 0 4px 15px rgba(76,175,80,0.4); }
+
+  .ball.bonus {
+    border: 3px solid var(--gold);
+    animation: bonusPulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes bonusPulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(255,215,0,0.3); }
+    50% { box-shadow: 0 0 25px rgba(255,215,0,0.7); }
+  }
+
+  .plus-sign {
+    font-size: 1.5rem;
+    color: var(--gold);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 18px;
+  }
+
+  .btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn:active { transform: scale(0.96); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(255,45,149,0.3);
+  }
+  .btn-primary:hover { box-shadow: 0 6px 30px rgba(255,45,149,0.5); transform: translateY(-2px); }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, var(--neon-blue), #0077b6);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0,212,255,0.3);
+  }
+  .btn-secondary:hover { box-shadow: 0 6px 30px rgba(0,212,255,0.5); transform: translateY(-2px); }
+
+  .btn-success {
+    background: linear-gradient(135deg, var(--neon-green), #00a86b);
+    color: #000;
+    box-shadow: 0 4px 20px rgba(57,255,20,0.3);
+  }
+  .btn-success:hover { box-shadow: 0 6px 30px rgba(57,255,20,0.5); transform: translateY(-2px); }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ff3b30, #cc0000);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(255,59,48,0.3);
+  }
+  .btn-danger:hover { box-shadow: 0 6px 30px rgba(255,59,48,0.5); transform: translateY(-2px); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), #ffaa00);
+    color: #1a1a2e;
+    box-shadow: 0 4px 20px rgba(255,215,0,0.3);
+  }
+  .btn-gold:hover { box-shadow: 0 6px 30px rgba(255,215,0,0.5); transform: translateY(-2px); }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Speed control */
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-content: center;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .speed-control label {
+    font-weight: 700;
+    color: var(--neon-blue);
+  }
+
+  .speed-slider {
+    -webkit-appearance: none;
+    width: 200px;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+    outline: none;
+  }
+
+  .speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .speed-val {
+    font-weight: 700;
+    color: var(--gold);
+    min-width: 90px;
+    text-align: center;
+  }
+
+  /* Stats grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  .stat-box {
+    background: rgba(255,255,255,0.04);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.2s;
+  }
+
+  .stat-box:hover { transform: translateY(-3px); }
+
+  .stat-label {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 900;
+  }
+
+  .stat-value.gold { color: var(--gold); }
+  .stat-value.pink { color: var(--neon-pink); }
+  .stat-value.blue { color: var(--neon-blue); }
+  .stat-value.green { color: var(--neon-green); }
+  .stat-value.purple { color: var(--neon-purple); }
+  .stat-value.orange { color: var(--neon-orange); }
+
+  /* Prize table */
+  .prize-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .prize-table th, .prize-table td {
+    padding: 10px 14px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .prize-table th {
+    color: var(--neon-blue);
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  .prize-table td {
+    font-weight: 700;
+  }
+
+  .prize-table tr:hover td {
+    background: rgba(255,255,255,0.03);
+  }
+
+  .rank-badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .rank-1 { background: linear-gradient(135deg, #ffd700, #ff9500); color: #1a1a2e; }
+  .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #1a1a2e; }
+  .rank-3 { background: linear-gradient(135deg, #cd7f32, #a0522d); color: #fff; }
+  .rank-4 { background: linear-gradient(135deg, var(--neon-blue), #0077b6); color: #fff; }
+  .rank-5 { background: linear-gradient(135deg, var(--neon-green), #00a86b); color: #1a1a2e; }
+
+  .win-highlight {
+    animation: winFlash 0.5s ease-in-out 3;
+  }
+
+  @keyframes winFlash {
+    0%, 100% { background: transparent; }
+    50% { background: rgba(255,215,0,0.15); }
+  }
+
+  /* Break-even bar */
+  .breakeven-section {
+    margin-top: 16px;
+  }
+
+  .breakeven-bar-bg {
+    width: 100%;
+    height: 30px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    margin: 10px 0;
+  }
+
+  .breakeven-bar-fill {
+    height: 100%;
+    border-radius: 15px;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-orange), var(--gold));
+    transition: width 0.5s ease;
+    min-width: 0;
+    position: relative;
+  }
+
+  .breakeven-bar-fill::after {
+    content: attr(data-pct);
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    white-space: nowrap;
+  }
+
+  .breakeven-info {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.9rem;
+  }
+
+  .breakeven-info span {
+    color: rgba(255,255,255,0.6);
+  }
+
+  .breakeven-info strong {
+    color: var(--gold);
+  }
+
+  /* Year counter */
+  .year-counter {
+    text-align: center;
+    padding: 20px;
+  }
+
+  .year-display {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .year-sub {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+  }
+
+  .timeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .timeline-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--neon-blue);
+    opacity: 0.3;
+    transition: all 0.3s;
+  }
+
+  .timeline-dot.active {
+    opacity: 1;
+    box-shadow: 0 0 8px var(--neon-blue);
+    transform: scale(1.3);
+  }
+
+  /* Roulette animation area */
+  .roulette-area {
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .roulette-balls .ball {
+    width: 48px;
+    height: 48px;
+    font-size: 1.1rem;
+    transition: none;
+  }
+
+  .roulette-label {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* Recent wins */
+  .recent-wins {
+    max-height: 180px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+  }
+
+  .recent-wins::-webkit-scrollbar { width: 6px; }
+  .recent-wins::-webkit-scrollbar-track { background: transparent; }
+  .recent-wins::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+  .win-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    background: rgba(255,255,255,0.03);
+    font-size: 0.88rem;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .win-entry .win-rank { font-weight: 700; }
+
+  /* ROI meter */
+  .roi-meter {
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  .roi-value {
+    font-size: 2.6rem;
+    font-weight: 900;
+  }
+
+  .roi-positive { color: var(--neon-green); }
+  .roi-negative { color: var(--neon-pink); }
+
+  /* Fireworks overlay */
+  .fireworks-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .firework-particle {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    animation: fireworkBurst 1.5s ease-out forwards;
+  }
+
+  @keyframes fireworkBurst {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+  }
+
+  /* 1st place mega win */
+  .mega-win-banner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: linear-gradient(135deg, rgba(255,215,0,0.95), rgba(255,149,0,0.95));
+    color: #1a1a2e;
+    padding: 40px 60px;
+    border-radius: 30px;
+    font-size: 2rem;
+    font-weight: 900;
+    text-align: center;
+    z-index: 10000;
+    animation: megaWinPop 0.5s ease forwards;
+    box-shadow: 0 0 60px rgba(255,215,0,0.5);
+  }
+
+  .mega-win-banner .sub { font-size: 1.1rem; margin-top: 8px; font-weight: 700; }
+
+  @keyframes megaWinPop {
+    0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); }
+    60% { transform: translate(-50%, -50%) scale(1.1) rotate(2deg); }
+    100% { transform: translate(-50%, -50%) scale(1) rotate(0); }
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.8rem; }
+    .ball { width: 46px; height: 46px; font-size: 1.05rem; }
+    .roulette-balls .ball { width: 38px; height: 38px; font-size: 0.95rem; }
+    .stat-value { font-size: 1.2rem; }
+    .card { padding: 20px; }
+    .btn { padding: 10px 20px; font-size: 0.9rem; }
+    .roi-value { font-size: 2rem; }
+  }
+
+  /* Two-column layout for desktop */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 800px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  /* Navigation */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,46,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0 16px;
+  }
+
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+
+  .nav-logo {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--gold);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 700;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .nav-links a:hover { opacity: 1; }
+
+  .nav-hamburger {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  @media (max-width: 600px) {
+    .nav-hamburger { display: block; }
+    .nav-links {
+      display: none;
+      position: absolute;
+      top: 56px;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,46,0.98);
+      flex-direction: column;
+      padding: 16px 24px;
+      gap: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-links.open { display: flex; }
+  }
+
+  /* About / Intro section */
+  .intro-section {
+    margin-bottom: 20px;
+  }
+
+  .intro-section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 14px;
+    color: var(--neon-blue);
+  }
+
+  .intro-section p {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 12px;
+  }
+
+  .intro-section .highlight-box {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  .feature-item {
+    background: rgba(255,255,255,0.04);
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .feature-item h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: var(--gold);
+  }
+
+  .feature-item p {
+    font-size: 0.85rem;
+    margin-bottom: 0;
+  }
+
+  /* Contact form */
+  .contact-section {
+    margin-top: 20px;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--neon-blue);
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: var(--neon-blue);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .form-group select option {
+    background: var(--bg-card);
+    color: var(--text);
+  }
+
+  /* Footer */
+  .site-footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 40px 16px 30px;
+    margin-top: 40px;
+    text-align: center;
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .footer-links a {
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--neon-blue); }
+
+  .footer-disclaimer {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.35);
+    line-height: 1.7;
+    max-width: 700px;
+    margin: 16px auto 0;
+  }
+
+  .footer-copyright {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.4);
+    margin-top: 20px;
+  }
+
+  /* Privacy & policy section */
+  .policy-section {
+    margin-top: 20px;
+  }
+
+  .policy-section h2 {
+    font-size: 1.3rem;
+    color: var(--neon-blue);
+    margin-bottom: 14px;
+  }
+
+  .policy-section h3 {
+    font-size: 1rem;
+    color: var(--gold);
+    margin: 18px 0 8px;
+  }
+
+  .policy-section p,
+  .policy-section li {
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.65);
+  }
+
+  .policy-section ul {
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">로또 시뮬레이터</a>
+    <button class="nav-hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="메뉴 열기">☰</button>
+    <ul class="nav-links">
+      <li><a href="#simulator">시뮬레이터</a></li>
+      <li><a href="#about">소개</a></li>
+      <li><a href="#stats-section">통계</a></li>
+      <li><a href="#contact">제휴문의</a></li>
+      <li><a href="#privacy">개인정보처리방침</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="header">
+    <h1>로또 시뮬레이터</h1>
+    <p>로또에 당첨되려면 얼마나 걸릴까? 직접 확인해보세요</p>
+  </div>
+
+  <!-- About / Intro -->
+  <section class="card intro-section" id="about">
+    <div class="card-title"><span class="icon">ℹ️</span> 로또 시뮬레이터란?</div>
+    <p>
+      <strong>로또 시뮬레이터</strong>는 대한민국 로또 6/45의 당첨 확률을 실시간으로 체험할 수 있는 무료 시뮬레이션 도구입니다.
+      실제 로또와 동일한 규칙(1~45번 중 6개 번호 + 보너스 번호)으로 추첨하여,
+      1등 당첨까지 얼마나 많은 시간과 비용이 필요한지를 직관적으로 보여드립니다.
+    </p>
+    <p>
+      로또 1등 당첨 확률은 약 <strong>1/8,145,060</strong>입니다. 매주 1게임씩 구매한다면
+      평균적으로 약 <strong>156,636년</strong>이 걸립니다. 이 시뮬레이터를 통해 로또의 현실적인 확률을 체감하고,
+      합리적인 소비 습관에 대해 생각해보는 계기가 되길 바랍니다.
+    </p>
+
+    <h2>주요 기능</h2>
+    <div class="highlight-box">
+      <div class="feature-item">
+        <h3>실시간 추첨 시뮬레이션</h3>
+        <p>초당 최대 1,000회까지 빠른 속도로 로또 추첨을 시뮬레이션합니다. 속도를 자유롭게 조절할 수 있습니다.</p>
+      </div>
+      <div class="feature-item">
+        <h3>상세 통계 분석</h3>
+        <p>총 추첨 횟수, 투자 금액, 당첨 금액, 수익률(ROI) 등 다양한 통계를 실시간으로 확인할 수 있습니다.</p>
+      </div>
+      <div class="feature-item">
+        <h3>손익분기점 계산</h3>
+        <p>현재까지의 투자금 대비 회수율을 계산하고, 손익분기점까지 남은 거리를 시각적으로 보여줍니다.</p>
+      </div>
+      <div class="feature-item">
+        <h3>시간 환산 시스템</h3>
+        <p>시뮬레이션 횟수를 실제 시간(년/주)으로 환산하여, 로또에 투자하는 시간의 규모를 체감할 수 있습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Simulator Section -->
+  <section id="simulator">
+
+  <!-- My Numbers -->
+  <div class="card">
+    <div class="card-title"><span class="icon">🎱</span> 나의 번호</div>
+    <div class="balls-container" id="myBalls">
+      <div class="ball range1">?</div>
+      <div class="ball range2">?</div>
+      <div class="ball range3">?</div>
+      <div class="ball range4">?</div>
+      <div class="ball range5">?</div>
+      <div class="ball range1">?</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="generateMyNumbers()">🎲 랜덤 번호 생성</button>
+    </div>
+  </div>
+
+  <!-- Roulette & Controls -->
+  <div class="card">
+    <div class="card-title"><span class="icon">🎰</span> 추첨 룰렛</div>
+    <div class="roulette-area">
+      <div class="roulette-label">현재 추첨 번호</div>
+      <div class="balls-container roulette-balls" id="rouletteBalls">
+        <div class="ball range1">-</div>
+        <div class="ball range2">-</div>
+        <div class="ball range3">-</div>
+        <div class="ball range4">-</div>
+        <div class="ball range5">-</div>
+        <div class="ball range1">-</div>
+        <span class="plus-sign">+</span>
+        <div class="ball range3 bonus">-</div>
+      </div>
+    </div>
+    <div class="speed-control">
+      <label>⚡ 속도:</label>
+      <input type="range" class="speed-slider" id="speedSlider" min="1" max="5" value="3" step="1">
+      <span class="speed-val" id="speedVal">초당 500회</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-success" id="btnStart" onclick="startSimulation()">▶ 시작</button>
+      <button class="btn btn-danger" id="btnStop" onclick="stopSimulation()" disabled>⏹ 정지</button>
+      <button class="btn btn-secondary" onclick="resetSimulation()">↻ 초기화</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="card" id="stats-section">
+    <div class="card-title"><span class="icon">📊</span> 실시간 통계</div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-label">총 추첨 횟수</div>
+        <div class="stat-value blue" id="statTotal">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">총 투자 금액</div>
+        <div class="stat-value pink" id="statInvest">0원</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">총 당첨 금액</div>
+        <div class="stat-value green" id="statWin">0원</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">순이익</div>
+        <div class="stat-value gold" id="statProfit">0원</div>
+      </div>
+    </div>
+
+    <!-- ROI -->
+    <div class="roi-meter">
+      <div style="margin-top:14px; font-size:0.85rem; color:rgba(255,255,255,0.5);">투자 대비 수익률</div>
+      <div class="roi-value roi-negative" id="roiValue">0%</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Prize breakdown -->
+    <div class="card">
+      <div class="card-title"><span class="icon">🏆</span> 등수별 당첨 현황</div>
+      <table class="prize-table">
+        <thead>
+          <tr><th>등수</th><th>당첨금</th><th>당첨 횟수</th><th>총 당첨금</th></tr>
+        </thead>
+        <tbody id="prizeTableBody">
+          <tr id="row-1"><td><span class="rank-badge rank-1">1등</span></td><td>20억원</td><td id="cnt1">0</td><td id="sum1">0원</td></tr>
+          <tr id="row-2"><td><span class="rank-badge rank-2">2등</span></td><td>3,000만원</td><td id="cnt2">0</td><td id="sum2">0원</td></tr>
+          <tr id="row-3"><td><span class="rank-badge rank-3">3등</span></td><td>200만원</td><td id="cnt3">0</td><td id="sum3">0원</td></tr>
+          <tr id="row-4"><td><span class="rank-badge rank-4">4등</span></td><td>5만원</td><td id="cnt4">0</td><td id="sum4">0원</td></tr>
+          <tr id="row-5"><td><span class="rank-badge rank-5">5등</span></td><td>5천원</td><td id="cnt5">0</td><td id="sum5">0원</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent wins -->
+    <div class="card">
+      <div class="card-title"><span class="icon">🎉</span> 최근 당첨 내역</div>
+      <div class="recent-wins" id="recentWins">
+        <div style="text-align:center;color:rgba(255,255,255,0.3);padding:30px;">아직 당첨 내역이 없습니다</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Break-even -->
+  <div class="card">
+    <div class="card-title"><span class="icon">📈</span> 손익분기점 분석</div>
+    <div class="breakeven-section">
+      <div class="breakeven-info">
+        <span>투자금 회수율: <strong id="beRecovery">0%</strong></span>
+        <span>손익분기까지 1등 <strong id="beNeeded">-</strong>회 필요</span>
+      </div>
+      <div class="breakeven-bar-bg">
+        <div class="breakeven-bar-fill" id="beBar" style="width:0%" data-pct="0%"></div>
+      </div>
+      <div style="font-size:0.82rem; color:rgba(255,255,255,0.4); margin-top:6px;" id="beComment">
+        시뮬레이션을 시작해보세요!
+      </div>
+    </div>
+  </div>
+
+  <!-- Year counter -->
+  <div class="card">
+    <div class="card-title"><span class="icon">📅</span> 시간 환산 (주 5게임 기준)</div>
+    <div class="year-counter">
+      <div class="year-display" id="yearDisplay">0년 0주</div>
+      <div class="year-sub" id="yearSub">매주 5,000원 투자 기준</div>
+      <div id="yearTimeline" style="margin-top:16px;font-size:0.95rem;color:rgba(255,255,255,0.5);"></div>
+      <div class="timeline" id="timelineDots"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- How to use -->
+  <section class="card intro-section">
+    <div class="card-title"><span class="icon">📖</span> 이용 방법</div>
+    <p><strong>1단계:</strong> "랜덤 번호 생성" 버튼을 클릭하여 나만의 로또 번호를 선택하세요. 원하는 만큼 다시 생성할 수 있습니다.</p>
+    <p><strong>2단계:</strong> 속도 슬라이더로 추첨 속도를 조절하세요. 초당 100회부터 1,000회까지 설정 가능합니다.</p>
+    <p><strong>3단계:</strong> "시작" 버튼을 누르면 자동으로 추첨이 진행됩니다. 실시간으로 통계가 업데이트됩니다.</p>
+    <p><strong>4단계:</strong> 당첨 현황, 손익분기점, 시간 환산 등 다양한 통계를 확인하며 로또 확률을 체감해보세요.</p>
+  </section>
+
+  <!-- Lotto knowledge -->
+  <section class="card intro-section">
+    <div class="card-title"><span class="icon">🎓</span> 로또 확률 알아보기</div>
+    <p>
+      로또 6/45는 1부터 45까지의 숫자 중 6개를 선택하는 복권입니다.
+      조합의 수는 총 <strong>8,145,060가지</strong>이며, 이 중 단 하나만이 1등에 해당합니다.
+    </p>
+    <p>
+      각 등수별 당첨 확률은 다음과 같습니다:
+    </p>
+    <div class="highlight-box">
+      <div class="feature-item">
+        <h3>1등 (6개 일치)</h3>
+        <p>확률: 1/8,145,060 (약 0.0000123%). 평균 당첨금 약 20억원.</p>
+      </div>
+      <div class="feature-item">
+        <h3>2등 (5개 + 보너스)</h3>
+        <p>확률: 6/8,145,060 (약 0.0000737%). 평균 당첨금 약 3,000만원.</p>
+      </div>
+      <div class="feature-item">
+        <h3>3등 (5개 일치)</h3>
+        <p>확률: 216/8,145,060 (약 0.00265%). 고정 당첨금 약 200만원.</p>
+      </div>
+      <div class="feature-item">
+        <h3>4등 / 5등</h3>
+        <p>4등(4개 일치): 약 0.0133%. 5등(3개 일치): 약 0.235%. 고정 당첨금 5만원 / 5천원.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact / Partnership inquiry -->
+  <section class="card contact-section" id="contact">
+    <div class="card-title"><span class="icon">📩</span> 제휴 및 광고 문의</div>
+    <p style="font-size:0.9rem;color:rgba(255,255,255,0.6);margin-bottom:20px;">
+      광고, 제휴, 협업 등 비즈니스 관련 문의를 남겨주세요. 확인 후 빠르게 답변드리겠습니다.
+    </p>
+    <form class="contact-form" action="https://formspree.io/f/xojnwveq" method="POST">
+      <div class="form-group">
+        <label for="contact-name">이름 / 회사명</label>
+        <input type="text" id="contact-name" name="name" placeholder="홍길동 / 주식회사 예시" required>
+      </div>
+      <div class="form-group">
+        <label for="contact-email">이메일</label>
+        <input type="email" id="contact-email" name="email" placeholder="example@email.com" required>
+      </div>
+      <div class="form-group">
+        <label for="contact-type">문의 유형</label>
+        <select id="contact-type" name="inquiry_type" required>
+          <option value="" disabled selected>선택해주세요</option>
+          <option value="광고 문의">광고 문의</option>
+          <option value="제휴 제안">제휴 제안</option>
+          <option value="협업 요청">협업 요청</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="contact-message">문의 내용</label>
+        <textarea id="contact-message" name="message" placeholder="문의하실 내용을 자세히 적어주세요." required></textarea>
+      </div>
+      <div class="btn-row">
+        <button type="submit" class="btn btn-primary">문의 보내기</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Privacy Policy -->
+  <section class="card policy-section" id="privacy">
+    <div class="card-title"><span class="icon">🔒</span> 개인정보처리방침</div>
+
+    <h3>1. 개인정보의 수집 및 이용 목적</h3>
+    <p>본 사이트(로또 시뮬레이터)는 제휴문의 처리를 위해 최소한의 개인정보를 수집합니다.</p>
+
+    <h3>2. 수집하는 개인정보 항목</h3>
+    <ul>
+      <li>제휴문의 폼: 이름(또는 회사명), 이메일 주소, 문의 내용</li>
+    </ul>
+
+    <h3>3. 개인정보의 보유 및 이용 기간</h3>
+    <p>수집된 개인정보는 문의 처리 완료 후 지체 없이 파기합니다. 단, 관련 법령에 의해 보존이 필요한 경우 해당 기간 동안 보관합니다.</p>
+
+    <h3>4. 개인정보의 제3자 제공</h3>
+    <p>본 사이트는 이용자의 동의 없이 개인정보를 제3자에게 제공하지 않습니다. 단, 제휴문의 폼은 Formspree 서비스를 통해 전송되며, Formspree의 개인정보처리방침이 적용됩니다.</p>
+
+    <h3>5. 쿠키 및 광고</h3>
+    <p>본 사이트는 Google AdSense를 통해 광고를 게재할 수 있으며, 이 과정에서 쿠키가 사용될 수 있습니다. Google의 광고 쿠키 사용에 대한 자세한 정보는 Google 개인정보처리방침에서 확인하실 수 있습니다.</p>
+
+    <h3>6. 이용자의 권리</h3>
+    <p>이용자는 언제든지 자신의 개인정보에 대해 열람, 수정, 삭제를 요청할 수 있으며, 제휴문의 폼을 통해 요청하실 수 있습니다.</p>
+
+    <h3>7. 시뮬레이션 데이터</h3>
+    <p>로또 시뮬레이션에서 생성되는 번호, 통계 등의 데이터는 사용자의 브라우저에서만 처리되며 서버로 전송되거나 저장되지 않습니다.</p>
+  </section>
+
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="#simulator">시뮬레이터</a>
+      <a href="#about">소개</a>
+      <a href="#stats-section">통계</a>
+      <a href="#contact">제휴문의</a>
+      <a href="#privacy">개인정보처리방침</a>
+    </div>
+    <div class="footer-disclaimer">
+      <strong>면책 조항:</strong> 본 사이트는 로또 당첨을 보장하거나 특정 번호를 추천하지 않습니다.
+      시뮬레이션 결과는 순수한 확률 기반의 무작위 추첨이며, 오락 및 교육 목적으로만 제공됩니다.
+      로또 구매는 개인의 판단과 책임 하에 이루어져야 합니다.
+      과도한 복권 구매는 재정적 어려움을 초래할 수 있으니 건전한 소비 습관을 유지하시기 바랍니다.
+    </div>
+    <div class="footer-copyright">
+      &copy; 2026 로또 시뮬레이터. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<!-- Fireworks container -->
+<div class="fireworks-overlay" id="fireworks"></div>
+
+<script>
+// === State ===
+const PRIZE = { 1: 2000000000, 2: 30000000, 3: 2000000, 4: 50000, 5: 5000 };
+const TICKET_PRICE = 1000;
+const SPEED_MAP = { 1: 100, 2: 250, 3: 500, 4: 750, 5: 1000 };
+
+let myNumbers = [];
+let running = false;
+let animFrameId = null;
+let totalDraws = 0;
+let totalWinnings = 0;
+let winCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+let recentWinsList = [];
+let currentSpeed = 500;
+let lastDisplayNums = [0,0,0,0,0,0,0]; // 6 main + 1 bonus for display
+
+// === Utility ===
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generateLottoNumbers() {
+  const nums = [];
+  while (nums.length < 6) {
+    const n = rand(1, 45);
+    if (!nums.includes(n)) nums.push(n);
+  }
+  nums.sort((a, b) => a - b);
+  let bonus;
+  do { bonus = rand(1, 45); } while (nums.includes(bonus));
+  return { main: nums, bonus };
+}
+
+function getBallClass(n) {
+  if (n <= 10) return 'range1';
+  if (n <= 20) return 'range2';
+  if (n <= 30) return 'range3';
+  if (n <= 40) return 'range4';
+  return 'range5';
+}
+
+function formatMoney(n) {
+  if (Math.abs(n) >= 100000000) {
+    const eok = n / 100000000;
+    return (Number.isInteger(eok) ? eok : eok.toFixed(1)) + '억원';
+  }
+  if (Math.abs(n) >= 10000) {
+    const man = n / 10000;
+    return (Number.isInteger(man) ? man : man.toFixed(0)) + '만원';
+  }
+  return n.toLocaleString() + '원';
+}
+
+function formatMoneyFull(n) {
+  return n.toLocaleString() + '원';
+}
+
+function checkWin(myNums, draw) {
+  const matchMain = myNums.filter(n => draw.main.includes(n)).length;
+  const matchBonus = myNums.includes(draw.bonus);
+
+  if (matchMain === 6) return 1;
+  if (matchMain === 5 && matchBonus) return 2;
+  if (matchMain === 5) return 3;
+  if (matchMain === 4) return 4;
+  if (matchMain === 3) return 5;
+  return 0;
+}
+
+// === UI ===
+function generateMyNumbers() {
+  const result = generateLottoNumbers();
+  myNumbers = result.main;
+  const container = document.getElementById('myBalls');
+  container.innerHTML = myNumbers.map(n =>
+    `<div class="ball ${getBallClass(n)}">${n}</div>`
+  ).join('');
+}
+
+function updateRoulette(main, bonus) {
+  const container = document.getElementById('rouletteBalls');
+  let html = '';
+  for (let i = 0; i < 6; i++) {
+    html += `<div class="ball ${getBallClass(main[i])}">${main[i]}</div>`;
+  }
+  html += `<span class="plus-sign">+</span>`;
+  html += `<div class="ball ${getBallClass(bonus)} bonus">${bonus}</div>`;
+  container.innerHTML = html;
+}
+
+function updateStats() {
+  const invested = totalDraws * TICKET_PRICE;
+  const profit = totalWinnings - invested;
+  const roi = invested > 0 ? ((totalWinnings / invested) * 100 - 100) : 0;
+
+  document.getElementById('statTotal').textContent = totalDraws.toLocaleString();
+  document.getElementById('statInvest').textContent = formatMoney(invested);
+  document.getElementById('statWin').textContent = formatMoney(totalWinnings);
+  document.getElementById('statProfit').textContent = (profit >= 0 ? '+' : '') + formatMoney(profit);
+  document.getElementById('statProfit').style.color = profit >= 0 ? 'var(--neon-green)' : 'var(--neon-pink)';
+
+  const roiEl = document.getElementById('roiValue');
+  roiEl.textContent = roi.toFixed(1) + '%';
+  roiEl.className = 'roi-value ' + (roi >= 0 ? 'roi-positive' : 'roi-negative');
+
+  // Prize table
+  for (let r = 1; r <= 5; r++) {
+    document.getElementById('cnt' + r).textContent = winCounts[r].toLocaleString();
+    document.getElementById('sum' + r).textContent = formatMoney(winCounts[r] * PRIZE[r]);
+  }
+
+  // Break-even
+  const recoveryPct = invested > 0 ? (totalWinnings / invested * 100) : 0;
+  document.getElementById('beRecovery').textContent = recoveryPct.toFixed(2) + '%';
+
+  const deficit = invested - totalWinnings;
+  if (deficit > 0) {
+    const needed = Math.ceil(deficit / PRIZE[1]);
+    document.getElementById('beNeeded').textContent = needed.toLocaleString();
+  } else {
+    document.getElementById('beNeeded').textContent = '0 (이미 흑자!)';
+  }
+
+  const barPct = Math.min(recoveryPct, 100);
+  const beBar = document.getElementById('beBar');
+  beBar.style.width = barPct + '%';
+  beBar.dataset.pct = barPct.toFixed(1) + '%';
+
+  const beComment = document.getElementById('beComment');
+  if (recoveryPct >= 100) {
+    beComment.textContent = '🎉 축하합니다! 손익분기점을 돌파했습니다!';
+    beComment.style.color = 'var(--neon-green)';
+  } else if (recoveryPct > 10) {
+    beComment.textContent = `현재 투자금의 ${recoveryPct.toFixed(1)}%를 회수했습니다. 갈 길이 멉니다...`;
+    beComment.style.color = 'var(--neon-orange)';
+  } else if (totalDraws > 0) {
+    beComment.textContent = `투자금의 ${recoveryPct.toFixed(2)}%만 회수... 로또의 현실입니다 😢`;
+    beComment.style.color = 'var(--neon-pink)';
+  }
+
+  // Year counter (5 games per week)
+  const weeks = Math.floor(totalDraws / 5);
+  const years = Math.floor(weeks / 52);
+  const remainWeeks = weeks % 52;
+  document.getElementById('yearDisplay').textContent = `${years.toLocaleString()}년 ${remainWeeks}주`;
+
+  const startYear = 2026;
+  const currentSimYear = startYear + years;
+  if (totalDraws > 0) {
+    document.getElementById('yearSub').textContent =
+      `${startYear}년부터 시작 → 현재 ${currentSimYear.toLocaleString()}년 (매주 ${(5000).toLocaleString()}원 투자)`;
+  }
+
+  // Timeline dots
+  updateTimeline(years);
+}
+
+function updateTimeline(years) {
+  const container = document.getElementById('timelineDots');
+  const yearInfo = document.getElementById('yearTimeline');
+
+  if (years === 0 && totalDraws === 0) {
+    container.innerHTML = '';
+    yearInfo.textContent = '';
+    return;
+  }
+
+  const startYear = 2026;
+  const milestones = [];
+  const step = years < 100 ? 10 : years < 1000 ? 100 : years < 10000 ? 1000 : 10000;
+  for (let y = 0; y <= years; y += step) {
+    milestones.push(y);
+  }
+  if (milestones[milestones.length - 1] !== years && years > 0) {
+    milestones.push(years);
+  }
+  // Limit dots
+  const show = milestones.slice(-30);
+  container.innerHTML = show.map((y, i) =>
+    `<div class="timeline-dot ${i === show.length - 1 ? 'active' : ''}" title="${startYear + y}년"></div>`
+  ).join('');
+
+  if (years >= 1) {
+    yearInfo.innerHTML = `📅 당신의 인생 <span style="color:var(--neon-pink);font-weight:700;">${years.toLocaleString()}년</span>을 로또에 바쳤습니다`;
+  }
+}
+
+function addRecentWin(rank, drawNum) {
+  const colors = { 1: 'var(--gold)', 2: '#c0c0c0', 3: '#cd7f32', 4: 'var(--neon-blue)', 5: 'var(--neon-green)' };
+  recentWinsList.unshift({ rank, drawNum, prize: PRIZE[rank] });
+  if (recentWinsList.length > 50) recentWinsList.pop();
+
+  const container = document.getElementById('recentWins');
+  container.innerHTML = recentWinsList.map(w =>
+    `<div class="win-entry">
+      <span class="win-rank" style="color:${colors[w.rank]}">${w.rank}등 당첨!</span>
+      <span style="color:rgba(255,255,255,0.4)">#${w.drawNum.toLocaleString()}회</span>
+      <span style="color:${colors[w.rank]};font-weight:700;">+${formatMoney(w.prize)}</span>
+    </div>`
+  ).join('');
+}
+
+// === Fireworks ===
+function launchFireworks(intensity) {
+  const overlay = document.getElementById('fireworks');
+  const colors = ['#ff2d95', '#00d4ff', '#39ff14', '#ffd700', '#bf5af2', '#ff9500'];
+  const count = intensity === 1 ? 80 : intensity === 2 ? 40 : 20;
+
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'firework-particle';
+    const cx = rand(20, 80);
+    const cy = rand(20, 60);
+    el.style.left = cx + '%';
+    el.style.top = cy + '%';
+    el.style.background = colors[rand(0, colors.length - 1)];
+    const angle = Math.random() * Math.PI * 2;
+    const dist = rand(80, 250);
+    el.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+    el.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+    el.style.animationDelay = (Math.random() * 0.5) + 's';
+    overlay.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  }
+}
+
+function showMegaWin(rank) {
+  if (rank > 2) return;
+  const banner = document.createElement('div');
+  banner.className = 'mega-win-banner';
+  banner.innerHTML = rank === 1
+    ? `🎊 1등 당첨!! 🎊<div class="sub">20억원 획득!</div>`
+    : `🎉 2등 당첨! 🎉<div class="sub">3,000만원 획득!</div>`;
+  document.body.appendChild(banner);
+  setTimeout(() => {
+    banner.style.transition = 'opacity 1s';
+    banner.style.opacity = '0';
+    setTimeout(() => banner.remove(), 1000);
+  }, 2500);
+}
+
+// === Simulation ===
+function startSimulation() {
+  if (myNumbers.length === 0) {
+    generateMyNumbers();
+  }
+  running = true;
+  document.getElementById('btnStart').disabled = true;
+  document.getElementById('btnStop').disabled = false;
+  runLoop();
+}
+
+function stopSimulation() {
+  running = false;
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnStop').disabled = true;
+  if (animFrameId) {
+    cancelAnimationFrame(animFrameId);
+    animFrameId = null;
+  }
+}
+
+function resetSimulation() {
+  stopSimulation();
+  totalDraws = 0;
+  totalWinnings = 0;
+  winCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  recentWinsList = [];
+  document.getElementById('recentWins').innerHTML =
+    '<div style="text-align:center;color:rgba(255,255,255,0.3);padding:30px;">아직 당첨 내역이 없습니다</div>';
+  updateStats();
+  const rb = document.getElementById('rouletteBalls');
+  rb.innerHTML = `
+    <div class="ball range1">-</div><div class="ball range2">-</div><div class="ball range3">-</div>
+    <div class="ball range4">-</div><div class="ball range5">-</div><div class="ball range1">-</div>
+    <span class="plus-sign">+</span><div class="ball range3 bonus">-</div>`;
+  document.getElementById('beComment').textContent = '시뮬레이션을 시작해보세요!';
+  document.getElementById('beComment').style.color = '';
+  document.getElementById('yearTimeline').textContent = '';
+  document.getElementById('timelineDots').innerHTML = '';
+}
+
+// Speed
+document.getElementById('speedSlider').addEventListener('input', function() {
+  currentSpeed = SPEED_MAP[this.value];
+  document.getElementById('speedVal').textContent = `초당 ${currentSpeed.toLocaleString()}회`;
+});
+
+let lastUIUpdate = 0;
+const UI_INTERVAL = 100; // update UI every 100ms
+let pendingWins = [];
+
+function runLoop() {
+  if (!running) return;
+
+  const now = performance.now();
+  const batchSize = Math.max(1, Math.floor(currentSpeed / (1000 / 16))); // per frame
+
+  let lastDraw = null;
+  for (let i = 0; i < batchSize; i++) {
+    const draw = generateLottoNumbers();
+    lastDraw = draw;
+    totalDraws++;
+    const rank = checkWin(myNumbers, draw);
+    if (rank > 0) {
+      winCounts[rank]++;
+      totalWinnings += PRIZE[rank];
+      pendingWins.push({ rank, drawNum: totalDraws });
+    }
+  }
+
+  // Update roulette display (visual only, show last draw of batch)
+  if (lastDraw) {
+    updateRoulette(lastDraw.main, lastDraw.bonus);
+  }
+
+  // Throttled UI update
+  if (now - lastUIUpdate > UI_INTERVAL) {
+    lastUIUpdate = now;
+    updateStats();
+
+    // Process pending wins for effects
+    for (const w of pendingWins) {
+      addRecentWin(w.rank, w.drawNum);
+      if (w.rank <= 3) {
+        launchFireworks(w.rank);
+        showMegaWin(w.rank);
+      }
+      // Flash row
+      const row = document.getElementById('row-' + w.rank);
+      if (row) {
+        row.classList.remove('win-highlight');
+        void row.offsetWidth;
+        row.classList.add('win-highlight');
+      }
+    }
+    pendingWins = [];
+  }
+
+  animFrameId = requestAnimationFrame(runLoop);
+}
+
+// Initialize
+generateMyNumbers();
+</script>
+
+</body>
+</html>
