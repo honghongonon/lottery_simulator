@@ -894,23 +894,6 @@
     <p>로또에 당첨되려면 얼마나 걸릴까? 직접 확인해보세요</p>
   </div>
 
-  <!-- Hall of Fame -->
-  <section class="card intro-section" id="hallOfFame">
-    <div class="card-title"><span class="icon">👑</span> 명예의 전당</div>
-    <div class="highlight-box" style="grid-template-columns: 1fr 1fr;">
-      <div class="feature-item">
-        <h3>최소 투자 1등 당첨</h3>
-        <p><strong id="hofBestWinCost">기록 없음</strong></p>
-        <p style="font-size: 0.8em; opacity: 0.7;" id="hofBestWinDraws"></p>
-      </div>
-      <div class="feature-item">
-        <h3>최대 손실</h3>
-        <p><strong id="hofBiggestLossCost">기록 없음</strong></p>
-        <p style="font-size: 0.8em; opacity: 0.7;" id="hofBiggestLossDraws"></p>
-      </div>
-    </div>
-  </section>
-
   <!-- About / Intro -->
   <section class="card intro-section" id="about">
     <div class="card-title"><span class="icon">ℹ️</span> 로또 시뮬레이터란?</div>
@@ -1112,7 +1095,7 @@
       </div>
       <div class="feature-item">
         <h3>4등 / 5등</h3>
-        <p>4등(4개 일치): 약 0.0133%. 5등(3개 일치): 약 0.235%. 고정 당첨금 5만원 / 5천원.</p>
+        <p>4등(4개 일치): 약 0.133%. 5등(3개 일치): 약 2.2%. 고정 당첨금 5만원 / 5천원.</p>
       </div>
     </div>
   </section>
@@ -1223,13 +1206,6 @@ let recentWinsList = [];
 let currentSpeed = 500;
 let lastDisplayNums = [0,0,0,0,0,0,0]; // 6 main + 1 bonus for display
 
-// === Hall of Fame State ===
-let hallOfFame = {
-  bestWin: { cost: Infinity, draws: 0 },
-  biggestLoss: { cost: 0, draws: 0 }
-};
-
-
 // === Utility ===
 function rand(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -1281,17 +1257,6 @@ function checkWin(myNums, draw) {
   if (matchMain === 4) return 4;
   if (matchMain === 3) return 5;
   return 0;
-}
-
-function saveHallOfFame() {
-  localStorage.setItem('lottoHallOfFame', JSON.stringify(hallOfFame));
-}
-
-function loadHallOfFame() {
-  const savedHof = localStorage.getItem('lottoHallOfFame');
-  if (savedHof) {
-    hallOfFame = JSON.parse(savedHof);
-  }
 }
 
 // === UI ===
@@ -1427,29 +1392,6 @@ function addRecentWin(rank, drawNum) {
   ).join('');
 }
 
-function displayHallOfFame() {
-  const bestWinCostEl = document.getElementById('hofBestWinCost');
-  const bestWinDrawsEl = document.getElementById('hofBestWinDraws');
-  const biggestLossCostEl = document.getElementById('hofBiggestLossCost');
-  const biggestLossDrawsEl = document.getElementById('hofBiggestLossDraws');
-
-  if (hallOfFame.bestWin.cost !== Infinity) {
-    bestWinCostEl.textContent = formatMoney(hallOfFame.bestWin.cost);
-    bestWinDrawsEl.textContent = `(${hallOfFame.bestWin.draws.toLocaleString()}회 만에 1등 당첨)`;
-  } else {
-    bestWinCostEl.textContent = '기록 없음';
-    bestWinDrawsEl.textContent = '';
-  }
-
-  if (hallOfFame.biggestLoss.cost > 0) {
-    biggestLossCostEl.textContent = formatMoney(hallOfFame.biggestLoss.cost);
-    biggestLossDrawsEl.textContent = `(${hallOfFame.biggestLoss.draws.toLocaleString()}회 시뮬레이션)`;
-  } else {
-    biggestLossCostEl.textContent = '기록 없음';
-    biggestLossDrawsEl.textContent = '';
-  }
-}
-
 // === Fireworks ===
 function launchFireworks(intensity) {
   const overlay = document.getElementById('fireworks');
@@ -1518,11 +1460,7 @@ function resetSimulation() {
   recentWinsList = [];
   document.getElementById('recentWins').innerHTML =
     '<div style="text-align:center;color:rgba(255,255,255,0.3);padding:30px;">아직 당첨 내역이 없습니다</div>';
-  // Reset biggest loss on manual reset, best win persists
-  hallOfFame.biggestLoss = { cost: 0, draws: 0 };
-  saveHallOfFame(); // Save updated biggest loss
   updateStats();
-  displayHallOfFame(); // Update display for reset
   const rb = document.getElementById('rouletteBalls');
   rb.innerHTML = `
     <div class="ball range1">-</div><div class="ball range2">-</div><div class="ball range3">-</div>
@@ -1555,27 +1493,11 @@ function runLoop() {
     const draw = generateLottoNumbers();
     lastDraw = draw;
     totalDraws++;
-    const invested = totalDraws * TICKET_PRICE; // Calculate invested for this iteration
-
-    // Update Biggest Loss
-    if (winCounts[1] === 0 && invested > hallOfFame.biggestLoss.cost) { // Only update if no 1st prize yet
-        hallOfFame.biggestLoss.cost = invested;
-        hallOfFame.biggestLoss.draws = totalDraws;
-    }
-
     const rank = checkWin(myNumbers, draw);
     if (rank > 0) {
       winCounts[rank]++;
       totalWinnings += PRIZE[rank];
       pendingWins.push({ rank, drawNum: totalDraws });
-
-      // Update Best Win
-      if (rank === 1) {
-        if (invested < hallOfFame.bestWin.cost) {
-          hallOfFame.bestWin.cost = invested;
-          hallOfFame.bestWin.draws = totalDraws;
-        }
-      }
     }
   }
 
@@ -1588,10 +1510,6 @@ function runLoop() {
   if (now - lastUIUpdate > UI_INTERVAL) {
     lastUIUpdate = now;
     updateStats();
-
-    // Save and display Hall of Fame after UI update
-    saveHallOfFame();
-    displayHallOfFame();
 
     // Process pending wins for effects
     for (const w of pendingWins) {
@@ -1615,9 +1533,7 @@ function runLoop() {
 }
 
 // Initialize
-loadHallOfFame(); // Load Hof data
 generateMyNumbers();
-displayHallOfFame(); // Display loaded Hof data
 </script>
 
 </body>
