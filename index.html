@@ -251,6 +251,472 @@
     box-shadow: none !important;
   }
 
+  /* === HALL OF FAME === */
+  .hall-of-fame {
+    position: relative;
+    overflow: hidden;
+    border: none;
+    background: linear-gradient(135deg, #0d0d3b 0%, #1a0a2e 50%, #0d0d3b 100%);
+  }
+
+  .hall-of-fame::before {
+    height: 4px;
+    background: linear-gradient(90deg, #ffd700, #ff9500, #ff2d95, #bf5af2, #00d4ff, #39ff14, #ffd700);
+    background-size: 200% 100%;
+    animation: shimmerBar 3s linear infinite;
+  }
+
+  @keyframes shimmerBar {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+  }
+
+  .hall-of-fame::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 15% 30%, rgba(255,215,0,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 70%, rgba(255,45,149,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hof-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hof-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .hof-header h2 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+  }
+
+  .hof-header p {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .hof-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .hof-tab {
+    padding: 8px 20px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: inherit;
+  }
+
+  .hof-tab:hover {
+    border-color: rgba(255,215,0,0.3);
+    color: rgba(255,255,255,0.8);
+  }
+
+  .hof-tab.active {
+    background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,149,0,0.15));
+    border-color: rgba(255,215,0,0.4);
+    color: var(--gold);
+    box-shadow: 0 0 20px rgba(255,215,0,0.1);
+  }
+
+  .hof-panel {
+    display: none;
+  }
+
+  .hof-panel.active {
+    display: block;
+    animation: fadeInPanel 0.3s ease;
+  }
+
+  @keyframes fadeInPanel {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hof-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hof-entry {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.04);
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hof-entry:hover {
+    background: rgba(255,255,255,0.06);
+    transform: translateX(4px);
+  }
+
+  .hof-entry.rank-gold {
+    background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,149,0,0.05));
+    border-color: rgba(255,215,0,0.15);
+  }
+
+  .hof-entry.rank-silver {
+    background: linear-gradient(135deg, rgba(192,192,192,0.06), rgba(160,160,160,0.04));
+    border-color: rgba(192,192,192,0.12);
+  }
+
+  .hof-entry.rank-bronze {
+    background: linear-gradient(135deg, rgba(205,127,50,0.06), rgba(160,82,45,0.04));
+    border-color: rgba(205,127,50,0.12);
+  }
+
+  .hof-rank {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+
+  .hof-rank.r1 {
+    background: linear-gradient(135deg, #ffd700, #ff9500);
+    color: #1a1a2e;
+    box-shadow: 0 0 15px rgba(255,215,0,0.3);
+  }
+  .hof-rank.r2 {
+    background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+    color: #1a1a2e;
+  }
+  .hof-rank.r3 {
+    background: linear-gradient(135deg, #cd7f32, #a0522d);
+    color: #fff;
+  }
+  .hof-rank.rn {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.4);
+    font-size: 0.85rem;
+  }
+
+  .hof-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hof-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hof-detail {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.45);
+    margin-top: 2px;
+  }
+
+  .hof-value {
+    font-weight: 900;
+    font-size: 1.05rem;
+    text-align: right;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .hof-value.loss { color: var(--neon-pink); }
+  .hof-value.lucky { color: var(--neon-green); }
+
+  .hof-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255,255,255,0.3);
+    font-size: 0.9rem;
+  }
+
+  .hof-empty .emoji {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  /* Register Form inside HOF */
+  .hof-register {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .hof-register-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .hof-register-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .hof-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50px;
+    padding: 10px 18px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 180px;
+  }
+
+  .hof-input:focus {
+    border-color: var(--gold);
+  }
+
+  .hof-input::placeholder {
+    color: rgba(255,255,255,0.25);
+  }
+
+  /* Share section */
+  .share-section {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .share-section::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(0,212,255,0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .share-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .share-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: inherit;
+    text-decoration: none;
+  }
+
+  .share-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  }
+
+  .share-btn.kakao {
+    background: rgba(254,229,0,0.12);
+    border-color: rgba(254,229,0,0.2);
+    color: #fee500;
+  }
+  .share-btn.kakao:hover { background: rgba(254,229,0,0.2); }
+
+  .share-btn.twitter {
+    background: rgba(29,161,242,0.12);
+    border-color: rgba(29,161,242,0.2);
+    color: #1da1f2;
+  }
+  .share-btn.twitter:hover { background: rgba(29,161,242,0.2); }
+
+  .share-btn.copy-link {
+    background: rgba(0,212,255,0.1);
+    border-color: rgba(0,212,255,0.2);
+    color: var(--neon-blue);
+  }
+  .share-btn.copy-link:hover { background: rgba(0,212,255,0.18); }
+
+  .share-btn.screenshot {
+    background: rgba(191,90,242,0.1);
+    border-color: rgba(191,90,242,0.2);
+    color: var(--neon-purple);
+  }
+  .share-btn.screenshot:hover { background: rgba(191,90,242,0.18); }
+
+  .share-result-card {
+    margin-top: 18px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
+    position: relative;
+  }
+
+  .share-result-card .src-title {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .share-stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .share-stat-item {
+    text-align: center;
+  }
+
+  .share-stat-item .label {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 2px;
+  }
+
+  .share-stat-item .val {
+    font-size: 1.1rem;
+    font-weight: 900;
+  }
+
+  .share-copied-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(57,255,20,0.9);
+    color: #0a0a2e;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    z-index: 10001;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+    box-shadow: 0 6px 20px rgba(57,255,20,0.3);
+  }
+
+  .share-copied-toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Live ticker */
+  .live-ticker-wrap {
+    overflow: hidden;
+    position: relative;
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    padding: 10px 0;
+    margin-bottom: 20px;
+  }
+
+  .live-ticker-wrap::before {
+    content: '🔴 LIVE';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #ff3b30;
+    z-index: 2;
+    background: rgba(0,0,0,0.6);
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    animation: livePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .live-ticker {
+    display: flex;
+    gap: 40px;
+    animation: tickerScroll 20s linear infinite;
+    white-space: nowrap;
+    padding-left: 80px;
+  }
+
+  @keyframes tickerScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .ticker-item {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.55);
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .ticker-item strong {
+    color: var(--gold);
+  }
+
+  .ticker-item .loss-val {
+    color: var(--neon-pink);
+  }
+
+  .ticker-item .win-val {
+    color: var(--neon-green);
+  }
+
   /* Speed control */
   .speed-control {
     display: flex;
@@ -879,6 +1345,7 @@
     <a href="#" class="nav-logo">로또 시뮬레이터</a>
     <button class="nav-hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="메뉴 열기">☰</button>
     <ul class="nav-links">
+      <li><a href="#hallOfFame">명예의 전당</a></li>
       <li><a href="#simulator">시뮬레이터</a></li>
       <li><a href="#about">소개</a></li>
       <li><a href="#stats-section">통계</a></li>
@@ -892,6 +1359,54 @@
   <div class="header">
     <h1>로또 시뮬레이터</h1>
     <p>로또에 당첨되려면 얼마나 걸릴까? 직접 확인해보세요</p>
+  </div>
+
+  <!-- Live Ticker -->
+  <div class="live-ticker-wrap" id="liveTicker" style="display:none;">
+    <div class="live-ticker" id="tickerContent"></div>
+  </div>
+
+  <!-- Hall of Fame -->
+  <div class="card hall-of-fame" id="hallOfFame">
+    <div class="hof-content">
+      <div class="hof-header">
+        <h2>🏆 명예의 전당</h2>
+        <p>시뮬레이터 이용자들의 전설적인 기록</p>
+      </div>
+
+      <div class="hof-tabs">
+        <button class="hof-tab active" onclick="switchHofTab('biggestLoss')" id="tabBiggestLoss">💸 최대손실 랭킹</button>
+        <button class="hof-tab" onclick="switchHofTab('cheapWin')" id="tabCheapWin">🍀 최소비용 1등</button>
+      </div>
+
+      <div class="hof-panel active" id="panelBiggestLoss">
+        <div class="hof-list" id="biggestLossList">
+          <div class="hof-empty">
+            <span class="emoji">💸</span>
+            아직 기록이 없습니다.<br>시뮬레이션 후 닉네임을 등록해보세요!
+          </div>
+        </div>
+      </div>
+
+      <div class="hof-panel" id="panelCheapWin">
+        <div class="hof-list" id="cheapWinList">
+          <div class="hof-empty">
+            <span class="emoji">🍀</span>
+            아직 1등 당첨자가 없습니다.<br>최소 비용으로 1등에 도전해보세요!
+          </div>
+        </div>
+      </div>
+
+      <!-- Register -->
+      <div class="hof-register" id="hofRegister">
+        <div class="hof-register-title">🏅 나의 기록 등록하기</div>
+        <div class="hof-register-row">
+          <input type="text" class="hof-input" id="hofNickname" placeholder="닉네임 (2~10자)" maxlength="10">
+          <button class="btn btn-gold" onclick="registerToHof()" id="hofRegBtn" style="padding:10px 22px;font-size:0.88rem;">등록</button>
+        </div>
+        <div style="text-align:center;margin-top:8px;font-size:0.75rem;color:rgba(255,255,255,0.3);" id="hofRegMsg"></div>
+      </div>
+    </div>
   </div>
 
   <!-- About / Intro -->
@@ -1163,12 +1678,69 @@
     <p>로또 시뮬레이션에서 생성되는 번호, 통계 등의 데이터는 사용자의 브라우저에서만 처리되며 서버로 전송되거나 저장되지 않습니다.</p>
   </section>
 
+  <!-- Share Results -->
+  <div class="card share-section" id="shareSection">
+    <div class="share-content">
+      <div class="card-title"><span class="icon">📢</span> 내 결과 공유하기</div>
+      <p style="font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:4px;">
+        친구들에게 나의 로또 시뮬레이션 결과를 자랑(?)해보세요!
+      </p>
+
+      <!-- Share result preview -->
+      <div class="share-result-card" id="sharePreview">
+        <div class="src-title">🎰 나의 로또 시뮬레이션 결과</div>
+        <div class="share-stats-row">
+          <div class="share-stat-item">
+            <div class="label">총 추첨</div>
+            <div class="val" style="color:var(--neon-blue);" id="shareDraws">0회</div>
+          </div>
+          <div class="share-stat-item">
+            <div class="label">총 투자</div>
+            <div class="val" style="color:var(--neon-pink);" id="shareInvest">0원</div>
+          </div>
+          <div class="share-stat-item">
+            <div class="label">순이익</div>
+            <div class="val" id="shareProfit" style="color:var(--neon-green);">0원</div>
+          </div>
+          <div class="share-stat-item">
+            <div class="label">1등 당첨</div>
+            <div class="val" style="color:var(--gold);" id="share1st">0회</div>
+          </div>
+          <div class="share-stat-item">
+            <div class="label">소요 시간</div>
+            <div class="val" style="color:var(--neon-purple);" id="shareYears">0년</div>
+          </div>
+        </div>
+        <div style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-top:8px;">lottosim.kr | 로또 시뮬레이터</div>
+      </div>
+
+      <div class="share-grid">
+        <button class="share-btn kakao" onclick="shareKakao()">
+          💬 카카오톡
+        </button>
+        <button class="share-btn twitter" onclick="shareTwitter()">
+          🐦 X (트위터)
+        </button>
+        <button class="share-btn copy-link" onclick="copyShareText()">
+          📋 텍스트 복사
+        </button>
+        <button class="share-btn screenshot" onclick="shareNative()">
+          📤 공유하기
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>
+
+<!-- Toast -->
+<div class="share-copied-toast" id="copiedToast">✅ 복사되었습니다!</div>
 
 <!-- Footer -->
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-links">
+      <a href="#hallOfFame">명예의 전당</a>
       <a href="#simulator">시뮬레이터</a>
       <a href="#about">소개</a>
       <a href="#stats-section">통계</a>
@@ -1532,8 +2104,290 @@ function runLoop() {
   animFrameId = requestAnimationFrame(runLoop);
 }
 
+// === Hall of Fame ===
+let hofData = { biggestLoss: [], cheapWin: [] };
+
+async function loadHofData() {
+  try {
+    const result = await window.storage.get('hof-leaderboard', true);
+    if (result && result.value) {
+      hofData = JSON.parse(result.value);
+    }
+  } catch (e) {
+    console.log('No existing HOF data');
+    hofData = { biggestLoss: [], cheapWin: [] };
+  }
+  renderHof();
+  renderTicker();
+}
+
+async function saveHofData() {
+  try {
+    await window.storage.set('hof-leaderboard', JSON.stringify(hofData), true);
+  } catch (e) {
+    console.error('Failed to save HOF data:', e);
+  }
+}
+
+function switchHofTab(tab) {
+  document.querySelectorAll('.hof-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.hof-panel').forEach(p => p.classList.remove('active'));
+  if (tab === 'biggestLoss') {
+    document.getElementById('tabBiggestLoss').classList.add('active');
+    document.getElementById('panelBiggestLoss').classList.add('active');
+  } else {
+    document.getElementById('tabCheapWin').classList.add('active');
+    document.getElementById('panelCheapWin').classList.add('active');
+  }
+}
+
+function getRankClass(index) {
+  if (index === 0) return 'rank-gold';
+  if (index === 1) return 'rank-silver';
+  if (index === 2) return 'rank-bronze';
+  return '';
+}
+
+function getRankBadgeClass(index) {
+  if (index === 0) return 'r1';
+  if (index === 1) return 'r2';
+  if (index === 2) return 'r3';
+  return 'rn';
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return '방금 전';
+  if (mins < 60) return `${mins}분 전`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}시간 전`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}일 전`;
+  return `${Math.floor(days / 30)}개월 전`;
+}
+
+function renderHof() {
+  // Biggest Loss
+  const lossList = document.getElementById('biggestLossList');
+  if (hofData.biggestLoss.length === 0) {
+    lossList.innerHTML = `<div class="hof-empty"><span class="emoji">💸</span>아직 기록이 없습니다.<br>시뮬레이션 후 닉네임을 등록해보세요!</div>`;
+  } else {
+    lossList.innerHTML = hofData.biggestLoss.slice(0, 10).map((entry, i) => `
+      <div class="hof-entry ${getRankClass(i)}">
+        <div class="hof-rank ${getRankBadgeClass(i)}">${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</div>
+        <div class="hof-info">
+          <div class="hof-name">${escapeHtml(entry.name)}</div>
+          <div class="hof-detail">${entry.draws.toLocaleString()}회 추첨 · ${timeAgo(entry.ts)}</div>
+        </div>
+        <div class="hof-value loss">-${formatMoney(entry.loss)}</div>
+      </div>
+    `).join('');
+  }
+
+  // Cheapest Win
+  const winList = document.getElementById('cheapWinList');
+  if (hofData.cheapWin.length === 0) {
+    winList.innerHTML = `<div class="hof-empty"><span class="emoji">🍀</span>아직 1등 당첨자가 없습니다.<br>최소 비용으로 1등에 도전해보세요!</div>`;
+  } else {
+    winList.innerHTML = hofData.cheapWin.slice(0, 10).map((entry, i) => `
+      <div class="hof-entry ${getRankClass(i)}">
+        <div class="hof-rank ${getRankBadgeClass(i)}">${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</div>
+        <div class="hof-info">
+          <div class="hof-name">${escapeHtml(entry.name)}</div>
+          <div class="hof-detail">${entry.draws.toLocaleString()}회만에 1등 당첨! · ${timeAgo(entry.ts)}</div>
+        </div>
+        <div class="hof-value lucky">${formatMoney(entry.cost)}</div>
+      </div>
+    `).join('');
+  }
+}
+
+function renderTicker() {
+  const allEntries = [
+    ...hofData.biggestLoss.map(e => ({...e, type: 'loss'})),
+    ...hofData.cheapWin.map(e => ({...e, type: 'win'}))
+  ];
+
+  if (allEntries.length === 0) {
+    document.getElementById('liveTicker').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('liveTicker').style.display = 'block';
+
+  // Duplicate for seamless scroll
+  const items = allEntries.map(e => {
+    if (e.type === 'loss') {
+      return `<div class="ticker-item"><strong>${escapeHtml(e.name)}</strong>님 <span class="loss-val">-${formatMoney(e.loss)}</span> 손실 (${e.draws.toLocaleString()}회)</div>`;
+    } else {
+      return `<div class="ticker-item"><strong>${escapeHtml(e.name)}</strong>님 <span class="win-val">${formatMoney(e.cost)}</span>으로 1등 당첨! (${e.draws.toLocaleString()}회)</div>`;
+    }
+  }).join('');
+
+  document.getElementById('tickerContent').innerHTML = items + items; // double for scroll loop
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function registerToHof() {
+  const nameInput = document.getElementById('hofNickname');
+  const msg = document.getElementById('hofRegMsg');
+  const name = nameInput.value.trim();
+
+  if (name.length < 2 || name.length > 10) {
+    msg.textContent = '닉네임은 2~10자로 입력해주세요.';
+    msg.style.color = 'var(--neon-pink)';
+    return;
+  }
+
+  if (totalDraws === 0) {
+    msg.textContent = '시뮬레이션을 먼저 진행해주세요!';
+    msg.style.color = 'var(--neon-pink)';
+    return;
+  }
+
+  const invested = totalDraws * TICKET_PRICE;
+  const loss = invested - totalWinnings;
+  const now = Date.now();
+
+  // Register to biggest loss (only if actually losing)
+  if (loss > 0) {
+    // Check for duplicate name - update if better
+    const existIdx = hofData.biggestLoss.findIndex(e => e.name === name);
+    if (existIdx >= 0) {
+      if (loss > hofData.biggestLoss[existIdx].loss) {
+        hofData.biggestLoss[existIdx] = { name, loss, draws: totalDraws, ts: now };
+      } else {
+        msg.textContent = '이전 기록이 더 높습니다! 더 도전해보세요 💪';
+        msg.style.color = 'var(--neon-orange)';
+        return;
+      }
+    } else {
+      hofData.biggestLoss.push({ name, loss, draws: totalDraws, ts: now });
+    }
+    hofData.biggestLoss.sort((a, b) => b.loss - a.loss);
+    hofData.biggestLoss = hofData.biggestLoss.slice(0, 50);
+  }
+
+  // Register to cheapest 1st place win
+  if (winCounts[1] > 0) {
+    const existIdx = hofData.cheapWin.findIndex(e => e.name === name);
+    if (existIdx >= 0) {
+      if (invested < hofData.cheapWin[existIdx].cost) {
+        hofData.cheapWin[existIdx] = { name, cost: invested, draws: totalDraws, ts: now };
+      }
+    } else {
+      hofData.cheapWin.push({ name, cost: invested, draws: totalDraws, ts: now });
+    }
+    hofData.cheapWin.sort((a, b) => a.cost - b.cost);
+    hofData.cheapWin = hofData.cheapWin.slice(0, 50);
+  }
+
+  saveHofData();
+  renderHof();
+  renderTicker();
+
+  msg.textContent = '🎉 기록이 등록되었습니다!';
+  msg.style.color = 'var(--neon-green)';
+  nameInput.value = '';
+
+  setTimeout(() => { msg.textContent = ''; }, 3000);
+}
+
+// === Share ===
+function updateSharePreview() {
+  const invested = totalDraws * TICKET_PRICE;
+  const profit = totalWinnings - invested;
+  const weeks = Math.floor(totalDraws / 5);
+  const years = Math.floor(weeks / 52);
+
+  document.getElementById('shareDraws').textContent = totalDraws.toLocaleString() + '회';
+  document.getElementById('shareInvest').textContent = formatMoney(invested);
+  document.getElementById('shareProfit').textContent = (profit >= 0 ? '+' : '') + formatMoney(profit);
+  document.getElementById('shareProfit').style.color = profit >= 0 ? 'var(--neon-green)' : 'var(--neon-pink)';
+  document.getElementById('share1st').textContent = winCounts[1].toLocaleString() + '회';
+  document.getElementById('shareYears').textContent = years > 0 ? years.toLocaleString() + '년' : '0년';
+}
+
+function getShareText() {
+  const invested = totalDraws * TICKET_PRICE;
+  const profit = totalWinnings - invested;
+  const weeks = Math.floor(totalDraws / 5);
+  const years = Math.floor(weeks / 52);
+
+  let text = `🎰 로또 시뮬레이터 결과\n\n`;
+  text += `📊 총 ${totalDraws.toLocaleString()}회 추첨\n`;
+  text += `💰 투자: ${formatMoney(invested)}\n`;
+  text += `${profit >= 0 ? '📈' : '📉'} 순이익: ${(profit >= 0 ? '+' : '') + formatMoney(profit)}\n`;
+  text += `🏆 1등: ${winCounts[1]}회 / 2등: ${winCounts[2]}회 / 3등: ${winCounts[3]}회\n`;
+  text += `📅 소요 시간: 약 ${years.toLocaleString()}년\n\n`;
+  text += `나도 해보기 👉 로또 시뮬레이터`;
+  return text;
+}
+
+function shareKakao() {
+  const text = getShareText();
+  const url = `https://sharer.kakao.com/talk/friends/picker/link?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank', 'width=500,height=600');
+}
+
+function shareTwitter() {
+  const text = getShareText();
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
+  window.open(url, '_blank', 'width=500,height=400');
+}
+
+async function copyShareText() {
+  const text = getShareText();
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('✅ 클립보드에 복사되었습니다!');
+  } catch (e) {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✅ 클립보드에 복사되었습니다!');
+  }
+}
+
+function shareNative() {
+  if (navigator.share) {
+    navigator.share({
+      title: '로또 시뮬레이터 결과',
+      text: getShareText(),
+      url: window.location.href
+    }).catch(() => {});
+  } else {
+    copyShareText();
+  }
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('copiedToast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// Hook into updateStats to also update share preview
+const _origUpdateStats = updateStats;
+updateStats = function() {
+  _origUpdateStats();
+  updateSharePreview();
+};
+
 // Initialize
 generateMyNumbers();
+loadHofData();
 </script>
 
 </body>
