@@ -1455,8 +1455,9 @@
     </div>
     <div class="speed-control">
       <label>⚡ 속도:</label>
-      <input type="range" class="speed-slider" id="speedSlider" min="1" max="5" value="3" step="1">
+      <input type="range" class="speed-slider" id="speedSlider" min="1" max="6" value="3" step="1">
       <span class="speed-val" id="speedVal">초당 1,000회</span>
+      <div class="speed-warn" id="speedWarn" style="display:none;color:var(--neon-orange);font-size:0.78rem;margin-top:4px;">⚠️ 고속 모드: 저사양 기기에서 프레임 드랍이 발생할 수 있습니다</div>
     </div>
     <div class="btn-row">
       <button class="btn btn-success" id="btnStart" onclick="startSimulation()">▶ 시작</button>
@@ -1759,7 +1760,7 @@
 // === State ===
 const PRIZE = { 1: 2000000000, 2: 30000000, 3: 2000000, 4: 50000, 5: 5000 };
 const TICKET_PRICE = 1000;
-const SPEED_MAP = { 1: 100, 2: 500, 3: 1000, 4: 2500, 5: 5000 };
+const SPEED_MAP = { 1: 100, 2: 500, 3: 1000, 4: 5000, 5: 10000, 6: 20000 };
 
 let myNumbers = [];
 let running = false;
@@ -1776,16 +1777,19 @@ function rand(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// Fisher-Yates 부분 셔플용 재사용 배열
+const _pool = Array.from({length: 45}, (_, i) => i + 1);
+
 function generateLottoNumbers() {
-  const nums = [];
-  while (nums.length < 6) {
-    const n = rand(1, 45);
-    if (!nums.includes(n)) nums.push(n);
+  const pool = _pool;
+  // Fisher-Yates: 앞에서 7개만 셔플 (6 main + 1 bonus)
+  for (let i = 0; i < 7; i++) {
+    const j = i + Math.floor(Math.random() * (45 - i));
+    const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
   }
-  nums.sort((a, b) => a - b);
-  let bonus;
-  do { bonus = rand(1, 45); } while (nums.includes(bonus));
-  return { main: nums, bonus };
+  const main = pool.slice(0, 6).sort((a, b) => a - b);
+  const bonus = pool[6];
+  return { main, bonus };
 }
 
 function getBallClass(n) {
@@ -1834,15 +1838,59 @@ function generateMyNumbers() {
   ).join('');
 }
 
-function updateRoulette(main, bonus) {
+// 룰렛 볼 DOM 캐싱
+let rouletteBallEls = [];
+let rouletteBonusEl = null;
+
+function initRouletteCache() {
   const container = document.getElementById('rouletteBalls');
-  let html = '';
+  container.innerHTML = '';
+  rouletteBallEls = [];
   for (let i = 0; i < 6; i++) {
-    html += `<div class="ball ${getBallClass(main[i])}">${main[i]}</div>`;
+    const el = document.createElement('div');
+    el.className = 'ball range1';
+    el.textContent = '-';
+    container.appendChild(el);
+    rouletteBallEls.push(el);
   }
-  html += `<span class="plus-sign">+</span>`;
-  html += `<div class="ball ${getBallClass(bonus)} bonus">${bonus}</div>`;
-  container.innerHTML = html;
+  const plus = document.createElement('span');
+  plus.className = 'plus-sign';
+  plus.textContent = '+';
+  container.appendChild(plus);
+  const bonusEl = document.createElement('div');
+  bonusEl.className = 'ball range3 bonus';
+  bonusEl.textContent = '-';
+  container.appendChild(bonusEl);
+  rouletteBonusEl = bonusEl;
+}
+
+function updateRoulette(main, bonus) {
+  for (let i = 0; i < 6; i++) {
+    rouletteBallEls[i].textContent = main[i];
+    rouletteBallEls[i].className = 'ball ' + getBallClass(main[i]);
+  }
+  rouletteBonusEl.textContent = bonus;
+  rouletteBonusEl.className = 'ball ' + getBallClass(bonus) + ' bonus';
+}
+
+// Stat DOM 캐싱
+let statEls = {};
+function initStatCache() {
+  statEls.total = document.getElementById('statTotal');
+  statEls.invest = document.getElementById('statInvest');
+  statEls.win = document.getElementById('statWin');
+  statEls.profit = document.getElementById('statProfit');
+  statEls.roi = document.getElementById('roiValue');
+  statEls.beRecovery = document.getElementById('beRecovery');
+  statEls.beNeeded = document.getElementById('beNeeded');
+  statEls.beBar = document.getElementById('beBar');
+  statEls.beComment = document.getElementById('beComment');
+  statEls.yearDisplay = document.getElementById('yearDisplay');
+  statEls.yearSub = document.getElementById('yearSub');
+  for (let r = 1; r <= 5; r++) {
+    statEls['cnt' + r] = document.getElementById('cnt' + r);
+    statEls['sum' + r] = document.getElementById('sum' + r);
+  }
 }
 
 function updateStats() {
@@ -1850,61 +1898,58 @@ function updateStats() {
   const profit = totalWinnings - invested;
   const roi = invested > 0 ? ((totalWinnings / invested) * 100 - 100) : 0;
 
-  document.getElementById('statTotal').textContent = totalDraws.toLocaleString();
-  document.getElementById('statInvest').textContent = formatMoney(invested);
-  document.getElementById('statWin').textContent = formatMoney(totalWinnings);
-  document.getElementById('statProfit').textContent = (profit >= 0 ? '+' : '') + formatMoney(profit);
-  document.getElementById('statProfit').style.color = profit >= 0 ? 'var(--neon-green)' : 'var(--neon-pink)';
+  statEls.total.textContent = totalDraws.toLocaleString();
+  statEls.invest.textContent = formatMoney(invested);
+  statEls.win.textContent = formatMoney(totalWinnings);
+  statEls.profit.textContent = (profit >= 0 ? '+' : '') + formatMoney(profit);
+  statEls.profit.style.color = profit >= 0 ? 'var(--neon-green)' : 'var(--neon-pink)';
 
-  const roiEl = document.getElementById('roiValue');
-  roiEl.textContent = roi.toFixed(1) + '%';
-  roiEl.className = 'roi-value ' + (roi >= 0 ? 'roi-positive' : 'roi-negative');
+  statEls.roi.textContent = roi.toFixed(1) + '%';
+  statEls.roi.className = 'roi-value ' + (roi >= 0 ? 'roi-positive' : 'roi-negative');
 
   // Prize table
   for (let r = 1; r <= 5; r++) {
-    document.getElementById('cnt' + r).textContent = winCounts[r].toLocaleString();
-    document.getElementById('sum' + r).textContent = formatMoney(winCounts[r] * PRIZE[r]);
+    statEls['cnt' + r].textContent = winCounts[r].toLocaleString();
+    statEls['sum' + r].textContent = formatMoney(winCounts[r] * PRIZE[r]);
   }
 
   // Break-even
   const recoveryPct = invested > 0 ? (totalWinnings / invested * 100) : 0;
-  document.getElementById('beRecovery').textContent = recoveryPct.toFixed(2) + '%';
+  statEls.beRecovery.textContent = recoveryPct.toFixed(2) + '%';
 
   const deficit = invested - totalWinnings;
   if (deficit > 0) {
     const needed = Math.ceil(deficit / PRIZE[1]);
-    document.getElementById('beNeeded').textContent = needed.toLocaleString();
+    statEls.beNeeded.textContent = needed.toLocaleString();
   } else {
-    document.getElementById('beNeeded').textContent = '0 (이미 흑자!)';
+    statEls.beNeeded.textContent = '0 (이미 흑자!)';
   }
 
   const barPct = Math.min(recoveryPct, 100);
-  const beBar = document.getElementById('beBar');
-  beBar.style.width = barPct + '%';
-  beBar.dataset.pct = barPct.toFixed(1) + '%';
+  statEls.beBar.style.width = barPct + '%';
+  statEls.beBar.dataset.pct = barPct.toFixed(1) + '%';
 
-  const beComment = document.getElementById('beComment');
   if (recoveryPct >= 100) {
-    beComment.textContent = '🎉 축하합니다! 손익분기점을 돌파했습니다!';
-    beComment.style.color = 'var(--neon-green)';
+    statEls.beComment.textContent = '🎉 축하합니다! 손익분기점을 돌파했습니다!';
+    statEls.beComment.style.color = 'var(--neon-green)';
   } else if (recoveryPct > 10) {
-    beComment.textContent = `현재 투자금의 ${recoveryPct.toFixed(1)}%를 회수했습니다. 갈 길이 멉니다...`;
-    beComment.style.color = 'var(--neon-orange)';
+    statEls.beComment.textContent = `현재 투자금의 ${recoveryPct.toFixed(1)}%를 회수했습니다. 갈 길이 멉니다...`;
+    statEls.beComment.style.color = 'var(--neon-orange)';
   } else if (totalDraws > 0) {
-    beComment.textContent = `투자금의 ${recoveryPct.toFixed(2)}%만 회수... 로또의 현실입니다 😢`;
-    beComment.style.color = 'var(--neon-pink)';
+    statEls.beComment.textContent = `투자금의 ${recoveryPct.toFixed(2)}%만 회수... 로또의 현실입니다 😢`;
+    statEls.beComment.style.color = 'var(--neon-pink)';
   }
 
   // Year counter (5 games per week)
   const weeks = Math.floor(totalDraws / 5);
   const years = Math.floor(weeks / 52);
   const remainWeeks = weeks % 52;
-  document.getElementById('yearDisplay').textContent = `${years.toLocaleString()}년 ${remainWeeks}주`;
+  statEls.yearDisplay.textContent = `${years.toLocaleString()}년 ${remainWeeks}주`;
 
   const startYear = 2026;
   const currentSimYear = startYear + years;
   if (totalDraws > 0) {
-    document.getElementById('yearSub').textContent =
+    statEls.yearSub.textContent =
       `${startYear}년부터 시작 → 현재 ${currentSimYear.toLocaleString()}년 (매주 ${(5000).toLocaleString()}원 투자)`;
   }
 
@@ -2026,13 +2071,9 @@ function resetSimulation() {
   document.getElementById('recentWins').innerHTML =
     '<div style="text-align:center;color:rgba(255,255,255,0.3);padding:30px;">아직 당첨 내역이 없습니다</div>';
   updateStats();
-  const rb = document.getElementById('rouletteBalls');
-  rb.innerHTML = `
-    <div class="ball range1">-</div><div class="ball range2">-</div><div class="ball range3">-</div>
-    <div class="ball range4">-</div><div class="ball range5">-</div><div class="ball range1">-</div>
-    <span class="plus-sign">+</span><div class="ball range3 bonus">-</div>`;
-  document.getElementById('beComment').textContent = '시뮬레이션을 시작해보세요!';
-  document.getElementById('beComment').style.color = '';
+  initRouletteCache();
+  statEls.beComment.textContent = '시뮬레이션을 시작해보세요!';
+  statEls.beComment.style.color = '';
   document.getElementById('yearTimeline').textContent = '';
   document.getElementById('timelineDots').innerHTML = '';
 }
@@ -2041,6 +2082,7 @@ function resetSimulation() {
 document.getElementById('speedSlider').addEventListener('input', function() {
   currentSpeed = SPEED_MAP[this.value];
   document.getElementById('speedVal').textContent = `초당 ${currentSpeed.toLocaleString()}회`;
+  document.getElementById('speedWarn').style.display = currentSpeed >= 10000 ? 'block' : 'none';
 });
 
 let lastUIUpdate = 0;
@@ -2390,6 +2432,8 @@ updateStats = function() {
 };
 
 // Initialize
+initRouletteCache();
+initStatCache();
 generateMyNumbers();
 loadHofData();
 </script>
