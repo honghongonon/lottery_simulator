@@ -308,45 +308,22 @@
     color: rgba(255,255,255,0.4);
   }
 
-  .hof-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
+  .hof-panel {
+    display: block;
     margin-bottom: 20px;
   }
 
-  .hof-tab {
-    padding: 8px 20px;
-    border-radius: 50px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.04);
-    color: rgba(255,255,255,0.6);
-    font-size: 0.85rem;
+  .hof-panel:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .hof-panel-title {
+    font-size: 1rem;
     font-weight: 700;
-    cursor: pointer;
-    transition: all 0.25s;
-    font-family: inherit;
-  }
-
-  .hof-tab:hover {
-    border-color: rgba(255,215,0,0.3);
-    color: rgba(255,255,255,0.8);
-  }
-
-  .hof-tab.active {
-    background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,149,0,0.15));
-    border-color: rgba(255,215,0,0.4);
     color: var(--gold);
-    box-shadow: 0 0 20px rgba(255,215,0,0.1);
-  }
-
-  .hof-panel {
-    display: none;
-  }
-
-  .hof-panel.active {
-    display: block;
-    animation: fadeInPanel 0.3s ease;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,215,0,0.15);
   }
 
   @keyframes fadeInPanel {
@@ -1374,12 +1351,8 @@
         <p>시뮬레이터 이용자들의 전설적인 기록</p>
       </div>
 
-      <div class="hof-tabs">
-        <button class="hof-tab active" onclick="switchHofTab('biggestLoss')" id="tabBiggestLoss">💸 최대손실 랭킹</button>
-        <button class="hof-tab" onclick="switchHofTab('cheapWin')" id="tabCheapWin">🍀 최소비용 1등</button>
-      </div>
-
-      <div class="hof-panel active" id="panelBiggestLoss">
+      <div class="hof-panel" id="panelBiggestLoss">
+        <div class="hof-panel-title">💸 최대손실 랭킹</div>
         <div class="hof-list" id="biggestLossList">
           <div class="hof-empty">
             <span class="emoji">💸</span>
@@ -1389,6 +1362,7 @@
       </div>
 
       <div class="hof-panel" id="panelCheapWin">
+        <div class="hof-panel-title">🍀 최소비용 1등</div>
         <div class="hof-list" id="cheapWinList">
           <div class="hof-empty">
             <span class="emoji">🍀</span>
@@ -1427,7 +1401,7 @@
     <div class="highlight-box">
       <div class="feature-item">
         <h3>실시간 추첨 시뮬레이션</h3>
-        <p>초당 최대 1,000회까지 빠른 속도로 로또 추첨을 시뮬레이션합니다. 속도를 자유롭게 조절할 수 있습니다.</p>
+        <p>초당 최대 5,000회까지 빠른 속도로 로또 추첨을 시뮬레이션합니다. 속도를 자유롭게 조절할 수 있습니다.</p>
       </div>
       <div class="feature-item">
         <h3>상세 통계 분석</h3>
@@ -1482,7 +1456,7 @@
     <div class="speed-control">
       <label>⚡ 속도:</label>
       <input type="range" class="speed-slider" id="speedSlider" min="1" max="5" value="3" step="1">
-      <span class="speed-val" id="speedVal">초당 500회</span>
+      <span class="speed-val" id="speedVal">초당 1,000회</span>
     </div>
     <div class="btn-row">
       <button class="btn btn-success" id="btnStart" onclick="startSimulation()">▶ 시작</button>
@@ -1785,7 +1759,7 @@
 // === State ===
 const PRIZE = { 1: 2000000000, 2: 30000000, 3: 2000000, 4: 50000, 5: 5000 };
 const TICKET_PRICE = 1000;
-const SPEED_MAP = { 1: 100, 2: 250, 3: 500, 4: 750, 5: 1000 };
+const SPEED_MAP = { 1: 100, 2: 500, 3: 1000, 4: 2500, 5: 5000 };
 
 let myNumbers = [];
 let running = false;
@@ -1794,7 +1768,7 @@ let totalDraws = 0;
 let totalWinnings = 0;
 let winCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 let recentWinsList = [];
-let currentSpeed = 500;
+let currentSpeed = 1000;
 let lastDisplayNums = [0,0,0,0,0,0,0]; // 6 main + 1 bonus for display
 
 // === Utility ===
@@ -2080,6 +2054,7 @@ function runLoop() {
   const batchSize = Math.max(1, Math.floor(currentSpeed / (1000 / 16))); // per frame
 
   let lastDraw = null;
+  let jackpotHit = false;
   for (let i = 0; i < batchSize; i++) {
     const draw = generateLottoNumbers();
     lastDraw = draw;
@@ -2089,6 +2064,10 @@ function runLoop() {
       winCounts[rank]++;
       totalWinnings += PRIZE[rank];
       pendingWins.push({ rank, drawNum: totalDraws });
+      if (rank === 1) {
+        jackpotHit = true;
+        break;
+      }
     }
   }
 
@@ -2097,8 +2076,8 @@ function runLoop() {
     updateRoulette(lastDraw.main, lastDraw.bonus);
   }
 
-  // Throttled UI update
-  if (now - lastUIUpdate > UI_INTERVAL) {
+  // Throttled UI update (force update on jackpot)
+  if (jackpotHit || now - lastUIUpdate > UI_INTERVAL) {
     lastUIUpdate = now;
     updateStats();
 
@@ -2118,6 +2097,12 @@ function runLoop() {
       }
     }
     pendingWins = [];
+  }
+
+  // 1등 당첨 시 자동 정지
+  if (jackpotHit) {
+    stopSimulation();
+    return;
   }
 
   animFrameId = requestAnimationFrame(runLoop);
@@ -2158,17 +2143,7 @@ async function saveHofData() {
   }
 }
 
-function switchHofTab(tab) {
-  document.querySelectorAll('.hof-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.hof-panel').forEach(p => p.classList.remove('active'));
-  if (tab === 'biggestLoss') {
-    document.getElementById('tabBiggestLoss').classList.add('active');
-    document.getElementById('panelBiggestLoss').classList.add('active');
-  } else {
-    document.getElementById('tabCheapWin').classList.add('active');
-    document.getElementById('panelCheapWin').classList.add('active');
-  }
-}
+function switchHofTab() { /* no-op: both panels always visible */ }
 
 function getRankClass(index) {
   if (index === 0) return 'rank-gold';
@@ -2202,7 +2177,7 @@ function renderHof() {
   if (hofData.biggestLoss.length === 0) {
     lossList.innerHTML = `<div class="hof-empty"><span class="emoji">💸</span>아직 기록이 없습니다.<br>시뮬레이션 후 닉네임을 등록해보세요!</div>`;
   } else {
-    lossList.innerHTML = hofData.biggestLoss.slice(0, 10).map((entry, i) => `
+    lossList.innerHTML = hofData.biggestLoss.slice(0, 5).map((entry, i) => `
       <div class="hof-entry ${getRankClass(i)}">
         <div class="hof-rank ${getRankBadgeClass(i)}">${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</div>
         <div class="hof-info">
@@ -2219,7 +2194,7 @@ function renderHof() {
   if (hofData.cheapWin.length === 0) {
     winList.innerHTML = `<div class="hof-empty"><span class="emoji">🍀</span>아직 1등 당첨자가 없습니다.<br>최소 비용으로 1등에 도전해보세요!</div>`;
   } else {
-    winList.innerHTML = hofData.cheapWin.slice(0, 10).map((entry, i) => `
+    winList.innerHTML = hofData.cheapWin.slice(0, 5).map((entry, i) => `
       <div class="hof-entry ${getRankClass(i)}">
         <div class="hof-rank ${getRankBadgeClass(i)}">${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</div>
         <div class="hof-info">
