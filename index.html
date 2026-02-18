@@ -2129,10 +2129,15 @@ let hofData = { biggestLoss: [], cheapWin: [] };
 function loadHofData() {
   hofRef.on('value', (snapshot) => {
     const data = snapshot.val();
+    const toArray = (val) => {
+      if (!val) return [];
+      if (Array.isArray(val)) return val;
+      return Object.values(val);
+    };
     if (data) {
       hofData = {
-        biggestLoss: data.biggestLoss || [],
-        cheapWin: data.cheapWin || []
+        biggestLoss: toArray(data.biggestLoss),
+        cheapWin: toArray(data.cheapWin)
       };
     } else {
       hofData = { biggestLoss: [], cheapWin: [] };
@@ -2144,7 +2149,10 @@ function loadHofData() {
 
 async function saveHofData() {
   try {
-    await hofRef.set(hofData);
+    await hofRef.set({
+      biggestLoss: hofData.biggestLoss.length > 0 ? hofData.biggestLoss : null,
+      cheapWin: hofData.cheapWin.length > 0 ? hofData.cheapWin : null
+    });
   } catch (e) {
     console.error('Failed to save HOF data:', e);
   }
