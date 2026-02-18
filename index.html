@@ -419,7 +419,16 @@
     font-size: 0.78rem;
     color: rgba(255,255,255,0.45);
     margin-top: 2px;
+    line-height: 1.5;
   }
+
+  .hof-sub {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.35);
+  }
+
+  .hof-sub .roi-pos { color: var(--neon-green); font-weight: 700; }
+  .hof-sub .roi-neg { color: var(--neon-pink); font-weight: 700; }
 
   .hof-value {
     font-weight: 900;
@@ -2213,22 +2222,43 @@ function timeAgo(ts) {
   return `${Math.floor(days / 30)}개월 전`;
 }
 
+function drawsToTimeStr(draws) {
+  const weeks = Math.floor(draws / 5);
+  const years = Math.floor(weeks / 52);
+  const remainWeeks = weeks % 52;
+  if (years > 0) return `${years.toLocaleString()}년 ${remainWeeks}주`;
+  if (weeks > 0) return `${weeks}주`;
+  return `${draws}회`;
+}
+
+function hofRoiStr(invested, winnings) {
+  if (invested <= 0) return '0%';
+  const roi = (winnings / invested * 100 - 100);
+  const sign = roi >= 0 ? '+' : '';
+  const cls = roi >= 0 ? 'roi-pos' : 'roi-neg';
+  return `<span class="${cls}">${sign}${roi.toFixed(1)}%</span>`;
+}
+
 function renderHof() {
   // Biggest Loss
   const lossList = document.getElementById('biggestLossList');
   if (hofData.biggestLoss.length === 0) {
     lossList.innerHTML = `<div class="hof-empty"><span class="emoji">💸</span>아직 기록이 없습니다.<br>시뮬레이션 후 닉네임을 등록해보세요!</div>`;
   } else {
-    lossList.innerHTML = hofData.biggestLoss.slice(0, 5).map((entry, i) => `
+    lossList.innerHTML = hofData.biggestLoss.slice(0, 5).map((entry, i) => {
+      const invested = entry.draws * TICKET_PRICE;
+      const winnings = entry.winnings != null ? entry.winnings : (invested - entry.loss);
+      return `
       <div class="hof-entry ${getRankClass(i)}">
         <div class="hof-rank ${getRankBadgeClass(i)}">${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</div>
         <div class="hof-info">
           <div class="hof-name">${escapeHtml(entry.name)}</div>
-          <div class="hof-detail">${entry.draws.toLocaleString()}회 추첨 · ${timeAgo(entry.ts)}</div>
+          <div class="hof-detail">${entry.draws.toLocaleString()}회 추첨 · ${drawsToTimeStr(entry.draws)} · ${timeAgo(entry.ts)}</div>
+          <div class="hof-sub">당첨금 ${formatMoney(winnings)} · 수익률 ${hofRoiStr(invested, winnings)}</div>
         </div>
         <div class="hof-value loss">-${formatMoney(entry.loss)}</div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   }
 
   // Cheapest Win
@@ -2236,16 +2266,21 @@ function renderHof() {
   if (hofData.cheapWin.length === 0) {
     winList.innerHTML = `<div class="hof-empty"><span class="emoji">🍀</span>아직 1등 당첨자가 없습니다.<br>최소 비용으로 1등에 도전해보세요!</div>`;
   } else {
-    winList.innerHTML = hofData.cheapWin.slice(0, 5).map((entry, i) => `
+    winList.innerHTML = hofData.cheapWin.slice(0, 5).map((entry, i) => {
+      const invested = entry.cost;
+      const winnings = entry.winnings != null ? entry.winnings : PRIZE[1];
+      const roi = hofRoiStr(invested, winnings);
+      return `
       <div class="hof-entry ${getRankClass(i)}">
         <div class="hof-rank ${getRankBadgeClass(i)}">${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</div>
         <div class="hof-info">
           <div class="hof-name">${escapeHtml(entry.name)}</div>
-          <div class="hof-detail">${entry.draws.toLocaleString()}회만에 1등 당첨! · ${timeAgo(entry.ts)}</div>
+          <div class="hof-detail">${entry.draws.toLocaleString()}회만에 1등! · ${drawsToTimeStr(entry.draws)} · ${timeAgo(entry.ts)}</div>
+          <div class="hof-sub">당첨금 ${formatMoney(winnings)} · 수익률 ${roi}</div>
         </div>
         <div class="hof-value lucky">${formatMoney(entry.cost)}</div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   }
 }
 
@@ -2307,14 +2342,14 @@ function registerToHof() {
     const existIdx = hofData.biggestLoss.findIndex(e => e.name === name);
     if (existIdx >= 0) {
       if (loss > hofData.biggestLoss[existIdx].loss) {
-        hofData.biggestLoss[existIdx] = { name, loss, draws: totalDraws, ts: now };
+        hofData.biggestLoss[existIdx] = { name, loss, draws: totalDraws, winnings: totalWinnings, ts: now };
       } else {
         msg.textContent = '이전 기록이 더 높습니다! 더 도전해보세요 💪';
         msg.style.color = 'var(--neon-orange)';
         return;
       }
     } else {
-      hofData.biggestLoss.push({ name, loss, draws: totalDraws, ts: now });
+      hofData.biggestLoss.push({ name, loss, draws: totalDraws, winnings: totalWinnings, ts: now });
     }
     hofData.biggestLoss.sort((a, b) => b.loss - a.loss);
     hofData.biggestLoss = hofData.biggestLoss.slice(0, 50);
@@ -2325,10 +2360,10 @@ function registerToHof() {
     const existIdx = hofData.cheapWin.findIndex(e => e.name === name);
     if (existIdx >= 0) {
       if (invested < hofData.cheapWin[existIdx].cost) {
-        hofData.cheapWin[existIdx] = { name, cost: invested, draws: totalDraws, ts: now };
+        hofData.cheapWin[existIdx] = { name, cost: invested, draws: totalDraws, winnings: totalWinnings, ts: now };
       }
     } else {
-      hofData.cheapWin.push({ name, cost: invested, draws: totalDraws, ts: now });
+      hofData.cheapWin.push({ name, cost: invested, draws: totalDraws, winnings: totalWinnings, ts: now });
     }
     hofData.cheapWin.sort((a, b) => a.cost - b.cost);
     hofData.cheapWin = hofData.cheapWin.slice(0, 50);
