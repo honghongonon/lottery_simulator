@@ -1762,6 +1762,25 @@
 <!-- Fireworks container -->
 <div class="fireworks-overlay" id="fireworks"></div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAivuVB9ub4EiNThA3qlUNM5xvCgw2E0M0",
+    authDomain: "lottery-simulator-abc2e.firebaseapp.com",
+    databaseURL: "https://lottery-simulator-abc2e-default-rtdb.firebaseio.com",
+    projectId: "lottery-simulator-abc2e",
+    storageBucket: "lottery-simulator-abc2e.firebasestorage.app",
+    messagingSenderId: "393750417178",
+    appId: "1:393750417178:web:08ee37743f28065fe266a3",
+    measurementId: "G-DRDZYGK32C"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const hofRef = db.ref('hof-leaderboard');
+</script>
+
 <script>
 // === State ===
 const PRIZE = { 1: 2000000000, 2: 30000000, 3: 2000000, 4: 50000, 5: 5000 };
@@ -2107,23 +2126,25 @@ function runLoop() {
 // === Hall of Fame ===
 let hofData = { biggestLoss: [], cheapWin: [] };
 
-async function loadHofData() {
-  try {
-    const result = await window.storage.get('hof-leaderboard', true);
-    if (result && result.value) {
-      hofData = JSON.parse(result.value);
+function loadHofData() {
+  hofRef.on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      hofData = {
+        biggestLoss: data.biggestLoss || [],
+        cheapWin: data.cheapWin || []
+      };
+    } else {
+      hofData = { biggestLoss: [], cheapWin: [] };
     }
-  } catch (e) {
-    console.log('No existing HOF data');
-    hofData = { biggestLoss: [], cheapWin: [] };
-  }
-  renderHof();
-  renderTicker();
+    renderHof();
+    renderTicker();
+  });
 }
 
 async function saveHofData() {
   try {
-    await window.storage.set('hof-leaderboard', JSON.stringify(hofData), true);
+    await hofRef.set(hofData);
   } catch (e) {
     console.error('Failed to save HOF data:', e);
   }
