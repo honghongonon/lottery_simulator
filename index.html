@@ -2278,7 +2278,7 @@ function renderHof() {
           <div class="hof-detail">${entry.draws.toLocaleString()}회만에 1등! · ${drawsToTimeStr(entry.draws)} · ${timeAgo(entry.ts)}</div>
           <div class="hof-sub">당첨금 ${formatMoney(winnings)} · 수익률 ${roi}</div>
         </div>
-        <div class="hof-value lucky">${formatMoney(entry.cost)}</div>
+        <div class="hof-value lucky">${formatMoney(winnings - invested)}</div>
       </div>`;
     }).join('');
   }

@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(start \"\" \"C:\\\\Users\\\\USER\\\\Desktop\\\\조코딩3시간\\\\로또시뮬레이터\\\\index.html\")"
+      "Bash(start \"\" \"C:\\\\Users\\\\USER\\\\Desktop\\\\조코딩3시간\\\\로또시뮬레이터\\\\index.html\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
